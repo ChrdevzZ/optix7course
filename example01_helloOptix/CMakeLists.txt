@@ -14,7 +14,7 @@
 # limitations under the License.                                           #
 # ======================================================================== #
 
-include_directories(${OptiX_INCLUDE})
+include_directories(${OptiX_INCLUDE_DIR})
 
 add_executable(ex01_helloOptix
   optix7.h

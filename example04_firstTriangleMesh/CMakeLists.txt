@@ -16,7 +16,7 @@
 
 find_package(OpenGL REQUIRED)
 
-include_directories(${OptiX_INCLUDE})
+include_directories(${OptiX_INCLUDE_DIR})
 
 cuda_compile_and_embed(embedded_ptx_code devicePrograms.cu)
 

@@ -21,14 +21,20 @@ if (POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif()
 
+cmake_minimum_required(VERSION 3.15...3.30)
 
-project(optix7course VERSION 1.0.1)
+project(optix7course VERSION 1.0.1 
+  LANGUAGES C CXX CUDA)
 
-cmake_minimum_required(VERSION 2.8)
 if (NOT WIN32)
-# visual studio doesn't like these (not need them):
-set (CMAKE_CXX_FLAGS "--std=c++11")
-set (CUDA_PROPAGATE_HOST_FLAGS ON)
+  # visual studio doesn't like these (not need them):
+  set (CMAKE_CXX_FLAGS "--std=c++11")
+  set (CUDA_PROPAGATE_HOST_FLAGS ON)
+endif()
+
+if (WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8 /wd4996")
+  set (CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler=\"/utf-8\"")
 endif()
 
 # ------------------------------------------------------------------
@@ -94,5 +100,3 @@ add_subdirectory(example09_shadowRays)
 add_subdirectory(example10_softShadows)
 add_subdirectory(example11_denoiseColorOnly)
 add_subdirectory(example12_denoiseSeparateChannels)
-
-

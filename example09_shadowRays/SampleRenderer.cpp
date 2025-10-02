@@ -656,7 +656,7 @@ namespace osc {
   void SampleRenderer::resize(const vec2i &newSize)
   {
     // if window minimized
-    if (newSize.x == 0 | newSize.y == 0) return;
+    if (newSize.x == 0 || newSize.y == 0) return;
     
     // resize our cuda frame buffer
     colorBuffer.resize(newSize.x*newSize.y*sizeof(uint32_t));

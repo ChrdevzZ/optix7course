@@ -27,7 +27,7 @@ find_package(OptiX REQUIRED)
 if (CUDA_TOOLKIT_ROOT_DIR)
 	include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include)
 endif()
-include_directories(${OptiX_INCLUDE})
+include_directories(${OptiX_INCLUDE_DIR})
 
 if (WIN32)
   add_definitions(-DNOMINMAX)
@@ -60,8 +60,6 @@ macro(cuda_compile_and_embed output_var cuda_file)
     )
   set(${output_var} ${embedded_file})
 endmacro()
-
-include_directories(${OptiX_INCLUDE})
 
 add_definitions(-D__CUDA_INCLUDE_COMPILER_INTERNAL_HEADERS__=1)
 
