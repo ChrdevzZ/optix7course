@@ -138,8 +138,7 @@ namespace osc {
     // triangle inputs
     // ==================================================================
     OptixBuildInput triangleInput = {};
-    triangleInput.type
-      = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
+    triangleInput.type            = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
 
     // create local variables, because we need a *pointer* to the
     // device pointers
@@ -160,7 +159,7 @@ namespace osc {
 
     // in this example we have one SBT entry, and no per-primitive
     // materials:
-    triangleInput.triangleArray.flags               = triangleInputFlags;
+    triangleInput.triangleArray.flags                       = triangleInputFlags;
     triangleInput.triangleArray.numSbtRecords               = 1;
     triangleInput.triangleArray.sbtIndexOffsetBuffer        = 0;
     triangleInput.triangleArray.sbtIndexOffsetSizeInBytes   = 0;
@@ -172,8 +171,8 @@ namespace osc {
 
     OptixAccelBuildOptions accelOptions = {};
     accelOptions.buildFlags             = OPTIX_BUILD_FLAG_NONE
-      | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
-      ;
+                                        | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
+                                        ;
     accelOptions.motionOptions.numKeys  = 1;
     accelOptions.operation              = OPTIX_BUILD_OPERATION_BUILD;
 
@@ -359,10 +358,10 @@ namespace osc {
     raygenPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
-    pgDesc.raygen.module            = module;
-    pgDesc.raygen.entryFunctionName = "__raygen__renderFrame";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+    pgDesc.raygen.module               = module;
+    pgDesc.raygen.entryFunctionName    = "__raygen__renderFrame";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -384,10 +383,10 @@ namespace osc {
     missPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_MISS;
-    pgDesc.miss.module            = module;
-    pgDesc.miss.entryFunctionName = "__miss__radiance";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_MISS;
+    pgDesc.miss.module                 = module;
+    pgDesc.miss.entryFunctionName      = "__miss__radiance";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -408,9 +407,9 @@ namespace osc {
     // for this simple example, we set up a single hit group
     hitgroupPGs.resize(1);
 
-    OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+    OptixProgramGroupOptions pgOptions  = {};
+    OptixProgramGroupDesc pgDesc        = {};
+    pgDesc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
     pgDesc.hitgroup.moduleCH            = module;
     pgDesc.hitgroup.entryFunctionNameCH = "__closesthit__radiance";
     pgDesc.hitgroup.moduleAH            = module;
@@ -477,7 +476,8 @@ namespace osc {
     // build raygen records
     // ------------------------------------------------------------------
     std::vector<RaygenRecord> raygenRecords;
-    for (int i=0;i<raygenPGs.size();i++) {
+    for (int i=0;i<raygenPGs.size();i++) 
+    {
       RaygenRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(raygenPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -490,7 +490,8 @@ namespace osc {
     // build miss records
     // ------------------------------------------------------------------
     std::vector<MissRecord> missRecords;
-    for (int i=0;i<missPGs.size();i++) {
+    for (int i=0;i<missPGs.size();i++) 
+    {
       MissRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(missPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -510,7 +511,8 @@ namespace osc {
     // (which the sanity checks in compilation would complain about)
     int numObjects = 1;
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int i=0;i<numObjects;i++) {
+    for (int i=0;i<numObjects;i++) 
+    {
       int objectType = 0;
       HitgroupRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupPGs[objectType],&rec));

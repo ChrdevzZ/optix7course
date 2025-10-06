@@ -65,7 +65,8 @@ namespace osc {
   {
     if (optixLaunchParams.frameID == 0 &&
         optixGetLaunchIndex().x == 0 &&
-        optixGetLaunchIndex().y == 0) {
+        optixGetLaunchIndex().y == 0) 
+    {
       // we could of course also have used optixGetLaunchDims to query
       // the launch size, but accessing the optixLaunchParams here
       // makes sure they're not getting optimized away (because
@@ -75,7 +76,7 @@ namespace osc {
              optixLaunchParams.fbSize.x,
              optixLaunchParams.fbSize.y);
       printf("############################################\n");
-  }
+    }
 
     // ------------------------------------------------------------------
     // for this example, produce a simple test pattern:

@@ -22,7 +22,7 @@
 namespace osc {
   using namespace gdt;
   
-  struct TriangleMeshSBTData {
+  struct TriangleMeshSBTData { // <- New SBT data structure here
     vec3f  color;
     vec3f *vertex;
     vec3i *index;

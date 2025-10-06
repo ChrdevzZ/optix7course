@@ -45,7 +45,7 @@ namespace osc {
   struct __align__( OPTIX_SBT_RECORD_ALIGNMENT ) HitgroupRecord
   {
     __align__( OPTIX_SBT_RECORD_ALIGNMENT ) char header[OPTIX_SBT_RECORD_HEADER_SIZE];
-    TriangleMeshSBTData data;
+    TriangleMeshSBTData data; // <- New here
   };
 
 
@@ -92,7 +92,7 @@ namespace osc {
   /*! constructor - performs all setup, including initializing
     optix, creates module, pipeline, programs, SBT, etc. */
   SampleRenderer::SampleRenderer(const TriangleMesh &model)
-    : model(model)
+    : model(model) // <- New here
   {
     initOptix();
 
@@ -137,9 +137,8 @@ namespace osc {
     // triangle inputs
     // ==================================================================
     OptixBuildInput triangleInput = {};
-    triangleInput.type
-      = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
-
+    triangleInput.type            = OPTIX_BUILD_INPUT_TYPE_TRIANGLES;
+     
     // create local variables, because we need a *pointer* to the
     // device pointers
     CUdeviceptr d_vertices = vertexBuffer.d_pointer();
@@ -159,7 +158,7 @@ namespace osc {
 
     // in this example we have one SBT entry, and no per-primitive
     // materials:
-    triangleInput.triangleArray.flags               = triangleInputFlags;
+    triangleInput.triangleArray.flags                       = triangleInputFlags;
     triangleInput.triangleArray.numSbtRecords               = 1;
     triangleInput.triangleArray.sbtIndexOffsetBuffer        = 0;
     triangleInput.triangleArray.sbtIndexOffsetSizeInBytes   = 0;
@@ -171,8 +170,8 @@ namespace osc {
 
     OptixAccelBuildOptions accelOptions = {};
     accelOptions.buildFlags             = OPTIX_BUILD_FLAG_NONE
-      | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
-      ;
+                                        | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
+                                        ;
     accelOptions.motionOptions.numKeys  = 1;
     accelOptions.operation              = OPTIX_BUILD_OPERATION_BUILD;
 

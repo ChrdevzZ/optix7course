@@ -45,7 +45,8 @@ namespace osc {
     world, then exit */
   extern "C" int main(int ac, char **av)
   {
-    try {
+    try 
+    {
       std::cout << "#osc: initializing optix..." << std::endl;
       
       initOptix();
@@ -58,7 +59,9 @@ namespace osc {
       // ...
       std::cout << "#osc: done. clean exit." << std::endl;
       
-    } catch (std::runtime_error& e) {
+    } 
+    catch (std::runtime_error& e) 
+    {
       std::cout << GDT_TERMINAL_RED << "FATAL ERROR: " << e.what()
                 << GDT_TERMINAL_DEFAULT << std::endl;
       exit(1);

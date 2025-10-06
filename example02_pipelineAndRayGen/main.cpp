@@ -26,10 +26,11 @@ namespace osc {
     world, then exit */
   extern "C" int main(int ac, char **av)
   {
-    try {
+    try 
+    {
       SampleRenderer sample;
 
-      const vec2i fbSize(vec2i(1200,1024));
+      const auto fbSize = vec2i(1200,1024);
       sample.resize(fbSize);
       sample.render();
 
@@ -44,7 +45,9 @@ namespace osc {
                 << "Image rendered, and saved to " << fileName << " ... done." << std::endl
                 << GDT_TERMINAL_DEFAULT
                 << std::endl;
-    } catch (std::runtime_error& e) {
+    } 
+    catch (std::runtime_error& e) 
+    {
       std::cout << GDT_TERMINAL_RED << "FATAL ERROR: " << e.what()
                 << GDT_TERMINAL_DEFAULT << std::endl;
       exit(1);

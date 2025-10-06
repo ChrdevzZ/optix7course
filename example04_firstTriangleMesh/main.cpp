@@ -111,7 +111,8 @@ namespace osc {
     world, then exit */
   extern "C" int main(int ac, char **av)
   {
-    try {
+    try 
+    {
       TriangleMesh model;
       // 100x100 thin ground plane
       model.addCube(vec3f(0.f,-1.5f,0.f),vec3f(10.f,.1f,10.f));
@@ -130,7 +131,9 @@ namespace osc {
                                               model,camera,worldScale);
       window->run();
       
-    } catch (std::runtime_error& e) {
+    } 
+    catch (std::runtime_error& e) 
+    {
       std::cout << GDT_TERMINAL_RED << "FATAL ERROR: " << e.what()
                 << GDT_TERMINAL_DEFAULT << std::endl;
       exit(1);

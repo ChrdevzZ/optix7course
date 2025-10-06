@@ -293,7 +293,7 @@ namespace osc {
                     callables invoked from IS or AH. */
                  2*1024,
                  /* [in] The direct stack size requirement for direct
-                    callables invoked from RG, MS, or CH.  */                 
+                    callables invoked from RG, MS, or CH.  */
                  2*1024,
                  /* [in] The continuation stack requirement. */
                  2*1024,
@@ -311,7 +311,8 @@ namespace osc {
     // build raygen records
     // ------------------------------------------------------------------
     std::vector<RaygenRecord> raygenRecords;
-    for (int i=0;i<raygenPGs.size();i++) {
+    for (int i=0;i<raygenPGs.size();i++) 
+    {
       RaygenRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(raygenPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -324,7 +325,8 @@ namespace osc {
     // build miss records
     // ------------------------------------------------------------------
     std::vector<MissRecord> missRecords;
-    for (int i=0;i<missPGs.size();i++) {
+    for (int i=0;i<missPGs.size();i++) 
+    {
       MissRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(missPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -344,7 +346,8 @@ namespace osc {
     // (which the sanity checks in compilation would complain about)
     int numObjects = 1;
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int i=0;i<numObjects;i++) {
+    for (int i=0;i<numObjects;i++) 
+    {
       int objectType = 0;
       HitgroupRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupPGs[objectType],&rec));

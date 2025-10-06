@@ -149,10 +149,10 @@ namespace osc {
 
     pipelineCompileOptions = {};
     pipelineCompileOptions.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
-    pipelineCompileOptions.usesMotionBlur     = false;
-    pipelineCompileOptions.numPayloadValues   = 2;
-    pipelineCompileOptions.numAttributeValues = 2;
-    pipelineCompileOptions.exceptionFlags     = OPTIX_EXCEPTION_FLAG_NONE;
+    pipelineCompileOptions.usesMotionBlur                   = false;
+    pipelineCompileOptions.numPayloadValues                 = 2;
+    pipelineCompileOptions.numAttributeValues               = 2;
+    pipelineCompileOptions.exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE;
     pipelineCompileOptions.pipelineLaunchParamsVariableName = "optixLaunchParams";
       
     pipelineLinkOptions.maxTraceDepth          = 2;
@@ -162,7 +162,7 @@ namespace osc {
     char log[2048];
     size_t sizeof_log = sizeof( log );
 #if OPTIX_VERSION >= 70700
-    OPTIX_CHECK(optixModuleCreate(optixContext,
+    OPTIX_CHECK(optixModuleCreate(       optixContext,
                                          &moduleCompileOptions,
                                          &pipelineCompileOptions,
                                          ptxCode.c_str(),
@@ -193,10 +193,10 @@ namespace osc {
     raygenPGs.resize(1);
       
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
-    pgDesc.raygen.module            = module;           
-    pgDesc.raygen.entryFunctionName = "__raygen__renderFrame";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+    pgDesc.raygen.module               = module;           
+    pgDesc.raygen.entryFunctionName    = "__raygen__renderFrame";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -218,10 +218,10 @@ namespace osc {
     missPGs.resize(1);
       
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_MISS;
-    pgDesc.miss.module            = module;           
-    pgDesc.miss.entryFunctionName = "__miss__radiance";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_MISS;
+    pgDesc.miss.module                 = module;           
+    pgDesc.miss.entryFunctionName      = "__miss__radiance";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -242,9 +242,9 @@ namespace osc {
     // for this simple example, we set up a single hit group
     hitgroupPGs.resize(1);
       
-    OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+    OptixProgramGroupOptions pgOptions  = {};
+    OptixProgramGroupDesc pgDesc        = {};
+    pgDesc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
     pgDesc.hitgroup.moduleCH            = module;           
     pgDesc.hitgroup.entryFunctionNameCH = "__closesthit__radiance";
     pgDesc.hitgroup.moduleAH            = module;           
@@ -293,7 +293,7 @@ namespace osc {
                     callables invoked from IS or AH. */
                  2*1024,
                  /* [in] The direct stack size requirement for direct
-                    callables invoked from RG, MS, or CH.  */                 
+                    callables invoked from RG, MS, or CH.  */
                  2*1024,
                  /* [in] The continuation stack requirement. */
                  2*1024,
@@ -311,7 +311,8 @@ namespace osc {
     // build raygen records
     // ------------------------------------------------------------------
     std::vector<RaygenRecord> raygenRecords;
-    for (int i=0;i<raygenPGs.size();i++) {
+    for (int i=0;i<raygenPGs.size();i++) 
+    {
       RaygenRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(raygenPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -324,7 +325,8 @@ namespace osc {
     // build miss records
     // ------------------------------------------------------------------
     std::vector<MissRecord> missRecords;
-    for (int i=0;i<missPGs.size();i++) {
+    for (int i=0;i<missPGs.size();i++) 
+    {
       MissRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(missPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -344,7 +346,8 @@ namespace osc {
     // (which the sanity checks in compilation would complain about)
     int numObjects = 1;
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int i=0;i<numObjects;i++) {
+    for (int i=0;i<numObjects;i++) 
+    {
       int objectType = 0;
       HitgroupRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupPGs[objectType],&rec));
