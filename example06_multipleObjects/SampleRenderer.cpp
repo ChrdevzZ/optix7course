@@ -92,7 +92,7 @@ namespace osc {
 
   /*! constructor - performs all setup, including initializing
     optix, creates module, pipeline, programs, SBT, etc. */
-  SampleRenderer::SampleRenderer(const std::vector<TriangleMesh> &meshes)
+  SampleRenderer::SampleRenderer(const std::vector<TriangleMesh> &meshes) // <- New here, multi-meshes
     : meshes(meshes)
   {
     initOptix();
@@ -110,7 +110,7 @@ namespace osc {
     std::cout << "#osc: creating hitgroup programs ..." << std::endl;
     createHitgroupPrograms();
 
-    launchParams.traversable = buildAccel();
+    launchParams.traversable = buildAccel(); // <- New here, no mesh param
 
     std::cout << "#osc: setting up optix pipeline ..." << std::endl;
     createPipeline();
@@ -126,7 +126,7 @@ namespace osc {
     std::cout << GDT_TERMINAL_DEFAULT;
   }
 
-  OptixTraversableHandle SampleRenderer::buildAccel()
+  OptixTraversableHandle SampleRenderer::buildAccel() // <- New here, multi-meshes
   {
     // meshes.resize(1);
 
@@ -138,12 +138,13 @@ namespace osc {
     // ==================================================================
     // triangle inputs
     // ==================================================================
-	std::vector<OptixBuildInput> triangleInput(meshes.size());
-  std::vector<CUdeviceptr> d_vertices(meshes.size());
-	std::vector<CUdeviceptr> d_indices(meshes.size());
-	std::vector<uint32_t> triangleInputFlags(meshes.size());
+    std::vector<OptixBuildInput> triangleInput(meshes.size());
+    std::vector<CUdeviceptr> d_vertices(meshes.size());
+    std::vector<CUdeviceptr> d_indices(meshes.size());
+    std::vector<uint32_t> triangleInputFlags(meshes.size());
 
-    for (int meshID=0;meshID<meshes.size();meshID++) {
+    for (int meshID=0;meshID<meshes.size();meshID++) 
+    {
     // upload the model to the device: the builder
     TriangleMesh &model = meshes[meshID];
     vertexBuffer[meshID].alloc_and_upload(model.vertex);
@@ -184,8 +185,8 @@ namespace osc {
 
     OptixAccelBuildOptions accelOptions = {};
     accelOptions.buildFlags             = OPTIX_BUILD_FLAG_NONE
-      | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
-      ;
+                                        | OPTIX_BUILD_FLAG_ALLOW_COMPACTION
+                                        ;
     accelOptions.motionOptions.numKeys  = 1;
     accelOptions.operation              = OPTIX_BUILD_OPERATION_BUILD;
 
@@ -327,13 +328,20 @@ namespace osc {
 
     pipelineCompileOptions = {};
     pipelineCompileOptions.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
-    pipelineCompileOptions.usesMotionBlur     = false;
-    pipelineCompileOptions.numPayloadValues   = 2;
-    pipelineCompileOptions.numAttributeValues = 2;
-    pipelineCompileOptions.exceptionFlags     = OPTIX_EXCEPTION_FLAG_NONE;
+    pipelineCompileOptions.usesMotionBlur                   = false;
+    pipelineCompileOptions.numPayloadValues                 = 2;
+    pipelineCompileOptions.numAttributeValues               = 2;
+    pipelineCompileOptions.exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE;
     pipelineCompileOptions.pipelineLaunchParamsVariableName = "optixLaunchParams";
 
-    pipelineLinkOptions.maxTraceDepth          = 2;
+    // *Curves* or *spheres* must be explicitly enabled in the pipeline to be rendered; 
+    // *triangles* and *custom primitives* are enabled by default. This is enabled in the 
+    // `OptixPipelineCompileOptions::usesPrimitiveTypeFlags` by setting the relevant bits
+    // from `OptixPrimitiveTypeFlags`.
+    pipelineCompileOptions.usesPrimitiveTypeFlags           = OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE
+                                                            ; // <- p add here, not necessary
+
+    pipelineLinkOptions.maxTraceDepth                       = 2;
 
     const std::string ptxCode = embedded_ptx_code;
 
@@ -371,10 +379,10 @@ namespace osc {
     raygenPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
-    pgDesc.raygen.module            = module;
-    pgDesc.raygen.entryFunctionName = "__raygen__renderFrame";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+    pgDesc.raygen.module               = module;
+    pgDesc.raygen.entryFunctionName    = "__raygen__renderFrame";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -396,10 +404,10 @@ namespace osc {
     missPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_MISS;
-    pgDesc.miss.module            = module;
-    pgDesc.miss.entryFunctionName = "__miss__radiance";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_MISS;
+    pgDesc.miss.module                 = module;
+    pgDesc.miss.entryFunctionName      = "__miss__radiance";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -420,9 +428,9 @@ namespace osc {
     // for this simple example, we set up a single hit group
     hitgroupPGs.resize(1);
 
-    OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+    OptixProgramGroupOptions pgOptions  = {};
+    OptixProgramGroupDesc pgDesc        = {};
+    pgDesc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
     pgDesc.hitgroup.moduleCH            = module;
     pgDesc.hitgroup.entryFunctionNameCH = "__closesthit__radiance";
     pgDesc.hitgroup.moduleAH            = module;
@@ -489,7 +497,8 @@ namespace osc {
     // build raygen records
     // ------------------------------------------------------------------
     std::vector<RaygenRecord> raygenRecords;
-    for (int i=0;i<raygenPGs.size();i++) {
+    for (int i=0;i<raygenPGs.size();i++) 
+    {
       RaygenRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(raygenPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -502,7 +511,8 @@ namespace osc {
     // build miss records
     // ------------------------------------------------------------------
     std::vector<MissRecord> missRecords;
-    for (int i=0;i<missPGs.size();i++) {
+    for (int i=0;i<missPGs.size();i++) 
+    {
       MissRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(missPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -518,13 +528,14 @@ namespace osc {
     // ------------------------------------------------------------------
     int numObjects = (int)meshes.size();
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int meshID=0;meshID<numObjects;meshID++) {
+    for (int meshID=0;meshID<numObjects;meshID++) 
+    {
       HitgroupRecord rec;
       // all meshes use the same code, so all same hit group
       OPTIX_CHECK(optixSbtRecordPackHeader(hitgroupPGs[0],&rec));
-      rec.data.color  = meshes[meshID].color;
       rec.data.vertex = (vec3f*)vertexBuffer[meshID].d_pointer();
       rec.data.index  = (vec3i*)indexBuffer[meshID].d_pointer();
+      rec.data.color  = meshes[meshID].color; // <- new here, multi-meshes
       hitgroupRecords.push_back(rec);
     }
     hitgroupRecordsBuffer.alloc_and_upload(hitgroupRecords);

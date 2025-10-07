@@ -313,13 +313,20 @@ namespace osc {
 
     pipelineCompileOptions = {};
     pipelineCompileOptions.traversableGraphFlags = OPTIX_TRAVERSABLE_GRAPH_FLAG_ALLOW_SINGLE_GAS;
-    pipelineCompileOptions.usesMotionBlur     = false;
-    pipelineCompileOptions.numPayloadValues   = 2;
-    pipelineCompileOptions.numAttributeValues = 2;
-    pipelineCompileOptions.exceptionFlags     = OPTIX_EXCEPTION_FLAG_NONE;
+    pipelineCompileOptions.usesMotionBlur                   = false;
+    pipelineCompileOptions.numPayloadValues                 = 2;
+    pipelineCompileOptions.numAttributeValues               = 2;
+    pipelineCompileOptions.exceptionFlags                   = OPTIX_EXCEPTION_FLAG_NONE;
     pipelineCompileOptions.pipelineLaunchParamsVariableName = "optixLaunchParams";
 
-    pipelineLinkOptions.maxTraceDepth          = 2;
+    // *Curves* or *spheres* must be explicitly enabled in the pipeline to be rendered; 
+    // *triangles* and *custom primitives* are enabled by default. This is enabled in the 
+    // `OptixPipelineCompileOptions::usesPrimitiveTypeFlags` by setting the relevant bits
+    // from `OptixPrimitiveTypeFlags`.
+    pipelineCompileOptions.usesPrimitiveTypeFlags           = OPTIX_PRIMITIVE_TYPE_FLAGS_TRIANGLE
+                                                            ; // <- p add here, not necessary
+
+    pipelineLinkOptions.maxTraceDepth                       = 2;
 
     const std::string ptxCode = embedded_ptx_code;
 
@@ -357,10 +364,10 @@ namespace osc {
     raygenPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
-    pgDesc.raygen.module            = module;
-    pgDesc.raygen.entryFunctionName = "__raygen__renderFrame";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_RAYGEN;
+    pgDesc.raygen.module               = module;
+    pgDesc.raygen.entryFunctionName    = "__raygen__renderFrame";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -382,10 +389,10 @@ namespace osc {
     missPGs.resize(1);
 
     OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_MISS;
-    pgDesc.miss.module            = module;
-    pgDesc.miss.entryFunctionName = "__miss__radiance";
+    OptixProgramGroupDesc pgDesc       = {};
+    pgDesc.kind                        = OPTIX_PROGRAM_GROUP_KIND_MISS;
+    pgDesc.miss.module                 = module;
+    pgDesc.miss.entryFunctionName      = "__miss__radiance";
 
     // OptixProgramGroup raypg;
     char log[2048];
@@ -406,9 +413,9 @@ namespace osc {
     // for this simple example, we set up a single hit group
     hitgroupPGs.resize(1);
 
-    OptixProgramGroupOptions pgOptions = {};
-    OptixProgramGroupDesc pgDesc    = {};
-    pgDesc.kind                     = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
+    OptixProgramGroupOptions pgOptions  = {};
+    OptixProgramGroupDesc pgDesc        = {};
+    pgDesc.kind                         = OPTIX_PROGRAM_GROUP_KIND_HITGROUP;
     pgDesc.hitgroup.moduleCH            = module;
     pgDesc.hitgroup.entryFunctionNameCH = "__closesthit__radiance";
     pgDesc.hitgroup.moduleAH            = module;
@@ -475,7 +482,8 @@ namespace osc {
     // build raygen records
     // ------------------------------------------------------------------
     std::vector<RaygenRecord> raygenRecords;
-    for (int i=0;i<raygenPGs.size();i++) {
+    for (int i=0;i<raygenPGs.size();i++) 
+    {
       RaygenRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(raygenPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -488,7 +496,8 @@ namespace osc {
     // build miss records
     // ------------------------------------------------------------------
     std::vector<MissRecord> missRecords;
-    for (int i=0;i<missPGs.size();i++) {
+    for (int i=0;i<missPGs.size();i++) 
+    {
       MissRecord rec;
       OPTIX_CHECK(optixSbtRecordPackHeader(missPGs[i],&rec));
       rec.data = nullptr; /* for now ... */
@@ -504,7 +513,8 @@ namespace osc {
     // ------------------------------------------------------------------
     int numObjects = 1;
     std::vector<HitgroupRecord> hitgroupRecords;
-    for (int i=0;i<numObjects;i++) {
+    for (int i=0;i<numObjects;i++) 
+    { // <- new here
       // we only have a single object type so far
       int objectType = 0;
       HitgroupRecord rec;

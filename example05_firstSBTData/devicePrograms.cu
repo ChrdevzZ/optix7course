@@ -64,7 +64,7 @@ namespace osc {
   // one group of them to set up the SBT)
   //------------------------------------------------------------------------------
   
-  extern "C" __global__ void __closesthit__radiance()
+  extern "C" __global__ void __closesthit__radiance() // <- new here
   {
     const TriangleMeshSBTData &sbtData
       = *(const TriangleMeshSBTData*)optixGetSbtDataPointer();

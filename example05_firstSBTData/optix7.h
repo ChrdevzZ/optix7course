@@ -23,8 +23,8 @@
 #include <sstream>
 #include <stdexcept>
 
-#define CUDA_CHECK(call)							\
-    {									\
+#define CUDA_CHECK(call) \
+    { \
       cudaError_t rc = cuda##call;                                      \
       if (rc != cudaSuccess) {                                          \
         std::stringstream txt;                                          \
@@ -36,7 +36,7 @@
     }
 
 #define CUDA_CHECK_NOEXCEPT(call)                                        \
-    {									\
+    { \
       cuda##call;                                                       \
     }
 
