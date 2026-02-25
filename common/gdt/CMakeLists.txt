@@ -24,7 +24,17 @@ project(GPU_Development_Tools)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+find_package(OptiX REQUIRED)
+find_package(CUDAToolkit REQUIRED)
+
+add_library(gdt-config
+  INTERFACE
+)
+target_link_libraries(gdt-config INTERFACE
+  CUDA::cuda_driver
+  CUDA::cudart_static
+  OptiX::OptiX
+)
 
 add_library(gdt 
   cmake/configure_build_type.cmake
@@ -35,6 +45,21 @@ add_library(gdt
   gdt/math/LinearSpace.h
   gdt/math/AffineSpace.h
   
-  gdt/gdt.cpp
+  gdt/gdt.cu
+)
+target_include_directories(gdt-config INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(gdt PUBLIC
+  gdt-config
+)
+
+set_target_properties(gdt
+  PROPERTIES
+  CUDA_SEPARABLE_COMPILATION ON
+  POSITION_INDEPENDENT_CODE ON
+  CUDA_RESOLVE_DEVICE_SYMBOLS ON
+  CUDA_USE_STATIC_CUDA_RUNTIME ON
   )
+
 

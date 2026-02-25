@@ -21,14 +21,24 @@ if (POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif()
 
-cmake_minimum_required(VERSION 3.15...3.30)
+cmake_minimum_required(VERSION 3.12)
 
-project(optix7course VERSION 1.0.1 
-  LANGUAGES C CXX CUDA)
+project(optix7course VERSION 1.0.2 LANGUAGES C CXX CUDA)
+
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CUDA_ARCHITECTURES native)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
+endif()
 
 if (NOT WIN32)
   # visual studio doesn't like these (not need them):
-  set (CMAKE_CXX_FLAGS "--std=c++11")
   set (CUDA_PROPAGATE_HOST_FLAGS ON)
 endif()
 
@@ -36,6 +46,8 @@ if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8 /wd4996")
   set (CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler=\"/utf-8\"")
 endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+  "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 
 # ------------------------------------------------------------------
 # first, include gdt project to do some general configuration stuff
@@ -77,8 +89,6 @@ add_subdirectory(common/glfWindow EXCLUDE_FROM_ALL)
 # and final build rules for the project
 # ------------------------------------------------------------------
 
-set(optix_LIBRARY "")
-
 # a first, simple, hello-world applicaion that creates a context, and
 # says hello...
 add_subdirectory(example01_helloOptix)
@@ -90,7 +100,6 @@ add_subdirectory(example02_pipelineAndRayGen)
 # the same rendering example, but in a glfwindow with continuous
 # rendering
 add_subdirectory(example03_inGLFWindow)
-
 add_subdirectory(example04_firstTriangleMesh)
 add_subdirectory(example05_firstSBTData)
 add_subdirectory(example06_multipleObjects)
