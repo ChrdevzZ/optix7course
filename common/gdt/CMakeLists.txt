@@ -32,7 +32,7 @@ add_library(gdt-config
 )
 target_link_libraries(gdt-config INTERFACE
   CUDA::cuda_driver
-  CUDA::cudart_static
+  CUDA::cudart
   OptiX::OptiX
 )
 
@@ -59,7 +59,7 @@ set_target_properties(gdt
   CUDA_SEPARABLE_COMPILATION ON
   POSITION_INDEPENDENT_CODE ON
   CUDA_RESOLVE_DEVICE_SYMBOLS ON
-  CUDA_USE_STATIC_CUDA_RUNTIME ON
+  CUDA_USE_STATIC_CUDA_RUNTIME OFF
   )
 
 

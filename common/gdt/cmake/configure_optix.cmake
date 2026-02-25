@@ -94,8 +94,20 @@ function(embed_ptx)
 
   target_link_libraries(${PTX_TARGET} PRIVATE ${EMBED_PTX_PTX_LINK_LIBRARIES})
   set_property(TARGET ${PTX_TARGET} PROPERTY CUDA_PTX_COMPILATION ON)
-  set_property(TARGET ${PTX_TARGET} PROPERTY CUDA_ARCHITECTURES OFF)
-  target_compile_options(${PTX_TARGET} PRIVATE -lineinfo -ptx)
+  # NOTE: CUDA 13.x with Visual Studio/MSBuild can fail with MSB4023 when
+  # CUDA_ARCHITECTURES is OFF on CUDA object libraries. Keep OFF on non-MSVC
+  # toolchains (historic behavior), but provide an explicit architecture for
+  # MSVC to avoid empty metadata propagation in CUDA .targets.
+  if (MSVC)
+    if (CMAKE_CUDA_ARCHITECTURES)
+      set_property(TARGET ${PTX_TARGET} PROPERTY CUDA_ARCHITECTURES "${CMAKE_CUDA_ARCHITECTURES}")
+    else()
+      set_property(TARGET ${PTX_TARGET} PROPERTY CUDA_ARCHITECTURES 75)
+    endif()
+  else()
+    set_property(TARGET ${PTX_TARGET} PROPERTY CUDA_ARCHITECTURES OFF)
+  endif()
+  target_compile_options(${PTX_TARGET} PRIVATE -lineinfo -ptx -diag-suppress=20044)
 
   ## Create command to run the bin2c via the CMake script ##
 

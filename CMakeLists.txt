@@ -43,8 +43,15 @@ if (NOT WIN32)
 endif()
 
 if (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8 /wd4996")
-  set (CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -Xcompiler=\"/utf-8\"")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8 /wd4996 /wd4819")
+  # CMake CUDA language mode does not reliably consume legacy CUDA_NVCC_FLAGS.
+  # Use CMAKE_CUDA_FLAGS only for host-compiler forwarding.
+  set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler=\"/utf-8 /wd4819\"")
+  # Let CMake avoid injecting legacy --cudart values; runtime linkage is
+  # provided explicitly via CUDAToolkit targets.
+  set(CMAKE_CUDA_RUNTIME_LIBRARY None)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCMTD")
 endif()
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
   "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
